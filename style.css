@@ -1,0 +1,22 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+html, body{
+    height:100%;
+}
+
+body{
+    background-color: rgb(255, 255, 255);
+    color: aqua;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+canvas{
+    border: 1px solid #2f00ff;
+    
+}
