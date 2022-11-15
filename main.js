@@ -1,15 +1,24 @@
-function Vector2(x,y){
-    this.x = x;
-    this.y = y;
-}
-function vecDelta(v1,v2)
+class Vector2
 {
-    returnVec = new Vector2(v1.x-v2.x,v1.y-v2.y);
-    return(returnVec);
-}
-function magnitude(vec)
-{
-    return(Math.sqrt(vec.x*vec.x+vec.y*vec.y));
+    constructor(x,y){
+        this.x = x;
+        this.y = y;
+    }
+
+    magnitude() {
+        return Math.sqrt(this.x*this.x+this.y*this.y);
+    }
+    static vectorAdd(v1,v2)
+    {
+        return new Vector2(v1.x+v2.x,v1.y+v2.y);
+    }
+    static VectorMult(vec,scalar)
+    {
+        var returnVec = vec;
+        returnVec.x *= scalar;
+        returnVec.y *= scalar;
+        return returnVec;
+    }
 }
 function Target(x,y,radius)
 {
@@ -19,8 +28,7 @@ function Target(x,y,radius)
 }
 function getMousePos(canvas, evt) {
   var rect = canvas.getBoundingClientRect();
-  vec = new Vector2();
-  return {x:evt.clientX - rect.left,y:evt.clientY - rect.top};
+  return new Vector2(evt.clientX - rect.left,evt.clientY - rect.top);
 }
 function drawCircle(x,y,colour)
 {
@@ -38,25 +46,23 @@ function draw(evt) {
 }
 
 function withinTarget(pos,targ, radius)
-{
-    if(magnitude(vecDelta(pos,targ))<radius)
-    {
-        return(true);
-    }
-    return(false);
+{   
+    return (Vector2.vectorAdd(pos,Vector2.VectorMult(targ,-1))).magnitude()<radius;
 }
 
 function onMouseDown(evt)
 {
     var mousePos = getMousePos(gameWindow,evt);
-    if(withinTarget(mousePos,{x: target.x,y: target.y},target.radius))
+    if(withinTarget(mousePos,new Vector2(target.x,target.y),target.radius))
     {
         console.log("hit button");
     }
 }
 
 //
-
+let vector = new Vector2(1,1);
+vector = Vector2.VectorMult(vector,1.41);
+console.log(vector.magnitude());
 //init game window
 var gameWindow = document.getElementById("gameWindow");
 var ctx = gameWindow.getContext("2d");
