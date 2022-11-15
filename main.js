@@ -125,6 +125,7 @@ var counting = false;
 var reacting = false;
 var targetSizes = [10,30,50];
 var lastRender = 0;
+var target;
 var count = 0;
 
 init();
