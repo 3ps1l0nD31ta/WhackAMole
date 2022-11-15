@@ -14,60 +14,53 @@ class Vector2
     }
     static VectorMult(vec,scalar)
     {
-        var returnVec = vec;
+        var returnVec = new Vector2(vec.x,vec.y);
         returnVec.x *= scalar;
         returnVec.y *= scalar;
         return returnVec;
     }
 }
-function Target(x,y,radius)
-{
-    this.x = x;
-    this.y = y;
-    this.radius = radius;
+class Target extends Vector2{
+    constructor(x,y,radius)
+    {
+        super(x,y);
+        this.radius = radius;
+    }
 }
 function getMousePos(canvas, evt) {
   var rect = canvas.getBoundingClientRect();
   return new Vector2(evt.clientX - rect.left,evt.clientY - rect.top);
 }
-function drawCircle(x,y,colour)
+function drawCircle(vec,colour)
 {
     ctx.fillStyle = colour;
     ctx.beginPath();
-    ctx.arc(x, y, 15, 0, 2 * Math.PI);
+    ctx.arc(vec.x, vec.y, 15, 0, 2 * Math.PI);
     ctx.fill();
     ctx.lineWidth = 5;
     ctx.strokeStyle = "#003300";
     ctx.stroke();
 }
-function draw(evt) {
-  var pos = getMousePos(gameWindow, evt);
-  drawCircle(pos.x,pos.y,"#005500");
-}
-
-function withinTarget(pos,targ, radius)
+function withinTarget(pos,targ)
 {   
-    return (Vector2.vectorAdd(pos,Vector2.VectorMult(targ,-1))).magnitude()<radius;
+    return (Vector2.vectorAdd(pos,Vector2.VectorMult(targ,-1))).magnitude()<targ.radius;
 }
-
 function onMouseDown(evt)
 {
     var mousePos = getMousePos(gameWindow,evt);
-    if(withinTarget(mousePos,new Vector2(target.x,target.y),target.radius))
+    if(withinTarget(mousePos,target))
     {
         console.log("hit button");
     }
 }
-
-//
-let vector = new Vector2(1,1);
-vector = Vector2.VectorMult(vector,1.41);
-console.log(vector.magnitude());
 //init game window
 var gameWindow = document.getElementById("gameWindow");
 var ctx = gameWindow.getContext("2d");
 //add draw to mousedown event
 gameWindow.addEventListener("mousedown",function(evt){onMouseDown(evt);});
+//init variables
+let centre = new Vector2(gameWindow.clientWidth/2,gameWindow.clientHeight/2);
+var target = new Target(centre.x,centre.y,15);
 //drawStartButton
-drawCircle(gameWindow.clientWidth/2,gameWindow.clientHeight/2,"#005500");
-var target = new Target(gameWindow.clientWidth/2,gameWindow.clientHeight/2,15);
+drawCircle(centre,"#005500");
+
