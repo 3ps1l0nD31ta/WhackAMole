@@ -31,14 +31,14 @@ function getMousePos(canvas, evt) {
   var rect = canvas.getBoundingClientRect();
   return new Vector2(evt.clientX - rect.left,evt.clientY - rect.top);
 }
-function drawCircle(vec,colour)
+function drawCircle(position,colour,outlineColour,radius)
 {
     ctx.fillStyle = colour;
     ctx.beginPath();
-    ctx.arc(vec.x, vec.y, 10, 0, 2 * Math.PI);
+    ctx.arc(position.x, position.y, radius-5, 0, 2 * Math.PI);
     ctx.fill();
     ctx.lineWidth = 5;
-    ctx.strokeStyle = "#003300";
+    ctx.strokeStyle = outlineColour;
     ctx.stroke();
 }
 function withinTarget(pos,targ)
@@ -47,65 +47,85 @@ function withinTarget(pos,targ)
 }
 function onMouseDown(evt)
 {
+    console.log("mouse down");
     var mousePos = getMousePos(gameWindow,evt);
     if(withinTarget(mousePos,target))
     {
         console.log("hit button");
-        hitStart = !hitStart;
+        hitTarget = !hitTarget;
     }
 }
-//init game window
-var gameWindow = document.getElementById("gameWindow");
-var ctx = gameWindow.getContext("2d");
-//add draw to mousedown event
-gameWindow.addEventListener("mousedown",function(evt){onMouseDown(evt);});
-//init variables
-let centre = new Vector2(gameWindow.clientWidth/2,gameWindow.clientHeight/2);
-var target = new Target(centre.x,centre.y,15);
-var hitStart = false;
-var counting = false;
-
-//drawStartButton
-drawCircle(centre,"#005500");
-
-function update(progress)
+function showNewTarget()
 {
-    if(hitStart)
+    var size = targetSizes[Math.floor(Math.random()*targetSizes.length)];
+    var x = Math.floor(Math.random()*(gameWindow.clientWidth-size));
+    var y = Math.floor(Math.random()*(gameWindow.clientHeight-size));
+    target = new Target(x,y,size);
+    drawCircle(target,"#005500","#003300",target.radius);
+} 
+function clearTarget()
+{
+    ctx.clearRect(target.x-target.radius,target.y-target.radius,target.radius*2,target.radius*2);
+}
+function showStartButton()
+{
+    drawCircle(centre,"#005500","#003300",15);
+    target = new Target(centre.x,centre.y,15);
+}
+function update(deltaTime)
+{
+    if(hitTarget)
     {
-        counting = true;
+        if(reacting)
+        {
+            clearTarget();
+            showStartButton();
+            counting = false;
+            hitTarget = false;
+            reacting = false;
+            count = 0;
+        }else{
+            clearTarget();
+            counting = true;
+        }
+        if(count>2000)
+        {
+            hitTarget = false;
+            count = 0;
+            showNewTarget();
+            reacting = true;
+        }
     }
     if(counting)
     {
-        count += progress;
-    }
-    if(count > 2000)
-    {
-        drawCircle(centre,"#005500");
-        counting = false;
-        hitStart = false;
-        count = 0;
-    }
-    console.log(counting);
-}
-
-function draw()
-{
-    if(hitStart)
-    {
-        ctx.clearRect(centre.x-target.radius,centre.y-target.radius,target.radius*2,target.radius*2);
+        count += deltaTime;
     }
 }
-
 function loop(timestamp)
 {
-    var progress = timestamp - lastRender;
+    var deltaTime = timestamp - lastRender;
 
-    update(progress);
-    draw();
+    update(deltaTime);
 
     lastRender = timestamp;
     window.requestAnimationFrame(loop);
 }
+function init()
+{
+    showStartButton();
+    gameWindow.addEventListener("mousedown",function(evt){onMouseDown(evt);});
+    window.requestAnimationFrame(loop);
+}
+//init variables
+var gameWindow = document.getElementById("gameWindow");
+var ctx = gameWindow.getContext("2d");
+var centre = new Vector2(gameWindow.clientWidth/2,gameWindow.clientHeight/2);
+var hitTarget = false;
+var counting = false;
+var reacting = false;
+var targetSizes = [10,30,50];
 var lastRender = 0;
 var count = 0;
-window.requestAnimationFrame(loop);
+
+init();
+
