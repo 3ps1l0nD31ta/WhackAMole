@@ -1,63 +1,59 @@
-function Vector2(x,y){
-    this.x = x;
-    this.y = y;
-}
-function vecDelta(v1,v2)
+class Vector2
 {
-    returnVec = new Vector2(v1.x-v2.x,v1.y-v2.y);
-    return(returnVec);
+    constructor(x,y){
+        this.x = x;
+        this.y = y;
+    }
+
+    magnitude() {
+        return Math.sqrt(this.x*this.x+this.y*this.y);
+    }
+    static vectorAdd(v1,v2)
+    {
+        return new Vector2(v1.x+v2.x,v1.y+v2.y);
+    }
+    static VectorMult(vec,scalar)
+    {
+        var returnVec = new Vector2(vec.x,vec.y);
+        returnVec.x *= scalar;
+        returnVec.y *= scalar;
+        return returnVec;
+    }
 }
-function magnitude(vec)
-{
-    return(Math.sqrt(vec.x*vec.x+vec.y*vec.y));
-}
-function Target(x,y,radius)
-{
-    this.x = x;
-    this.y = y;
-    this.radius = radius;
+class Target extends Vector2{
+    constructor(x,y,radius)
+    {
+        super(x,y);
+        this.radius = radius;
+    }
 }
 function getMousePos(canvas, evt) {
   var rect = canvas.getBoundingClientRect();
-  vec = new Vector2();
-  return {x:evt.clientX - rect.left,y:evt.clientY - rect.top};
+  return new Vector2(evt.clientX - rect.left,evt.clientY - rect.top);
 }
-function drawCircle(x,y,colour)
+function drawCircle(vec,colour)
 {
     ctx.fillStyle = colour;
     ctx.beginPath();
-    ctx.arc(x, y, 15, 0, 2 * Math.PI);
+    ctx.arc(vec.x, vec.y, 10, 0, 2 * Math.PI);
     ctx.fill();
     ctx.lineWidth = 5;
     ctx.strokeStyle = "#003300";
     ctx.stroke();
 }
-function draw(evt) {
-  var pos = getMousePos(gameWindow, evt);
-  drawCircle(pos.x,pos.y,"#005500");
+function withinTarget(pos,targ)
+{   
+    return (Vector2.vectorAdd(pos,Vector2.VectorMult(targ,-1))).magnitude()<targ.radius;
 }
-
-function withinTarget(pos,targ, radius)
-{
-    if(magnitude(vecDelta(pos,targ))<radius)
-    {
-        return(true);
-    }
-    return(false);
-}
-
 function onMouseDown(evt)
 {
     var mousePos = getMousePos(gameWindow,evt);
-    if(withinTarget(mousePos,{x: target.x,y: target.y},target.radius))
+    if(withinTarget(mousePos,target))
     {
         console.log("hit button");
         hitStart = !hitStart;
     }
 }
-
-//
-
 //init game window
 var gameWindow = document.getElementById("gameWindow");
 var ctx = gameWindow.getContext("2d");
@@ -65,9 +61,10 @@ var ctx = gameWindow.getContext("2d");
 gameWindow.addEventListener("mousedown",function(evt){onMouseDown(evt);});
 //init variables
 let centre = new Vector2(gameWindow.clientWidth/2,gameWindow.clientHeight/2);
-var target = new Target(centre.x,centre.y,20);
+var target = new Target(centre.x,centre.y,15);
 var hitStart = false;
 var counting = false;
+
 //drawStartButton
 drawCircle(centre,"#005500");
 
@@ -112,4 +109,3 @@ function loop(timestamp)
 var lastRender = 0;
 var count = 0;
 window.requestAnimationFrame(loop);
-
