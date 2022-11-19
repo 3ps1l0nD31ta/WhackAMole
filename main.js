@@ -9,10 +9,23 @@ class TimeData extends Array
         })
         return(returnString);
     }
-
+    getSum()
+    {
+        var sum = 0;
+        this.forEach(function(currentValue)
+        {
+            sum += currentValue;
+        })
+        return sum;
+    }
+    getMean()
+    {
+        return this.getSum()/this.length;
+    }
     outputToFile(){
         var element = document.createElement('a');
-        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.getString()));
+        var outputString = "mean: " + this.getMean() + "\n";
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(outputString.concat(this.getString())));
         element.setAttribute('download', "WhackAMoleTimings.txt");
 
         element.style.display = 'none';
@@ -70,9 +83,17 @@ function withinTarget(pos,targ)
 {   
     return (Vector2.vectorAdd(pos,Vector2.VectorMult(targ,-1))).magnitude()<targ.radius;
 }
+function onKeyDown(evt)
+{
+    switch (evt.which || evt.charCode || evt.keyCode) { 
+		case 70:
+            data.outputToFile();
+            break;
+	} 
+
+}
 function onMouseDown(evt)
 {
-    console.log("mouse down");
     var mousePos = getMousePos(gameWindow,evt);
     if(withinTarget(mousePos,target))
     {
@@ -108,6 +129,7 @@ function update(deltaTime)
             counting = false;
             hitTarget = false;
             reacting = false;
+            data.push(count);
             count = 0;
         }else{
             clearTarget();
@@ -139,6 +161,7 @@ function init()
 {
     showStartButton();
     gameWindow.addEventListener("mousedown",function(evt){onMouseDown(evt);});
+    document.onkeydown = onKeyDown; 
     window.requestAnimationFrame(loop);
 }
 //init variables
