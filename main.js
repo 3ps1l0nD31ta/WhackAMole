@@ -1,3 +1,28 @@
+class TimeData extends Array
+{
+    getString()
+    {
+        var returnString = "";
+        this.forEach(function(currentValue)
+        {
+            returnString = returnString.concat(currentValue + ", ");
+        })
+        return(returnString);
+    }
+
+    outputToFile(){
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(this.getString()));
+        element.setAttribute('download', "WhackAMoleTimings.txt");
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+
+        element.click();
+
+        document.body.removeChild(element);
+    }
+}
 class Vector2
 {
     constructor(x,y){
@@ -119,6 +144,7 @@ function init()
 //init variables
 var gameWindow = document.getElementById("gameWindow");
 var ctx = gameWindow.getContext("2d");
+var data = new TimeData();
 var centre = new Vector2(gameWindow.clientWidth/2,gameWindow.clientHeight/2);
 var hitTarget = false;
 var counting = false;
