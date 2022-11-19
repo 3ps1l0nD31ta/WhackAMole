@@ -8,7 +8,7 @@ html, body{
 }
 
 body{
-    background-color: rgb(255, 255, 255);
+    background-color: rgb(53, 53, 53);
     color: aqua;
     display: flex;
     flex-direction: column;
@@ -17,6 +17,6 @@ body{
 }
 
 canvas{
-    border: 1px solid #2f00ff;
-    
+    border: 0px solid #2f00ff;
+    background-color: rgb(29, 29, 29);
 }
