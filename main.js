@@ -63,18 +63,25 @@ class Target extends Vector2{
     {
         super(x,y);
         this.radius = radius;
-        
     }
 }
-class TargetData extends Vector2
+class TargetData
 {
-    constructor(x,y,radius,innerColour,outerColour,sizePxl)
+    constructor(innerColour,outerColour,sizePxl)
     {
-        super(x,y);
-        this.radius = radius;
         this.innerColour = innerColour;
         this.outerColour = outerColour;
         this.sizePxl = sizePxl;
+    }
+}
+class RespondingStage
+{
+    update(delta)
+    {
+        if(hitTarget)
+        {
+            console.log(delta);
+        }
     }
 }
 function getMousePos(canvas, evt) {
@@ -132,6 +139,8 @@ function showStartButton()
 }
 function update(deltaTime)
 {
+    console.log(hitTarget);
+    stage.update(deltaTime);
     if(hitTarget)
     {
         if(reacting)
@@ -190,6 +199,8 @@ var targetSizes = [10,30,50];
 var lastRender = 0;
 var target;
 var count = 0;
+
+var stage = new RespondingStage();
 
 init();
 
