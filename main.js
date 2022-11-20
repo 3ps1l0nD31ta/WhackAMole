@@ -63,12 +63,15 @@ class Target extends Vector2{
     {
         super(x,y);
         this.radius = radius;
+        
     }
 }
-class ColourData
+class TargetData extends Vector2
 {
-    constructor(innerColour,outerColour,sizePxl)
+    constructor(x,y,radius,innerColour,outerColour,sizePxl)
     {
+        super(x,y);
+        this.radius = radius;
         this.innerColour = innerColour;
         this.outerColour = outerColour;
         this.sizePxl = sizePxl;
@@ -178,8 +181,8 @@ var gameWindow = document.getElementById("gameWindow");
 var ctx = gameWindow.getContext("2d");
 var data = new TimeData();
 var centre = new Vector2(gameWindow.clientWidth/2,gameWindow.clientHeight/2);
-var startButtonData = new ColourData("#005500","#003300",15);
-var targetButtons = [new ColourData("#c40000","#a30000",10),new ColourData("#cfc500","#afa600",30), new ColourData("#0033cc","#002aa9",30)];
+var startButtonData = new TargetData("#005500","#003300",15);
+var targetButtons = [new TargetData("#c40000","#a30000",10),new TargetData("#cfc500","#afa600",30), new TargetData("#0033cc","#002aa9",30)];
 var hitTarget = false;
 var counting = false;
 var reacting = false;
