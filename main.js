@@ -65,6 +65,15 @@ class Target extends Vector2{
         this.radius = radius;
     }
 }
+class ColourData
+{
+    constructor(innerColour,outerColour,sizePxl)
+    {
+        this.innerColour = innerColour;
+        this.outerColour = outerColour;
+        this.sizePxl = sizePxl;
+    }
+}
 function getMousePos(canvas, evt) {
   var rect = canvas.getBoundingClientRect();
   return new Vector2(evt.clientX - rect.left,evt.clientY - rect.top);
@@ -103,11 +112,11 @@ function onMouseDown(evt)
 }
 function showNewTarget()
 {
-    var size = targetSizes[Math.floor(Math.random()*targetSizes.length)];
-    var x = Math.floor(Math.random()*(gameWindow.clientWidth-size));
-    var y = Math.floor(Math.random()*(gameWindow.clientHeight-size));
-    target = new Target(x,y,size);
-    drawCircle(target,"#005500","#003300",target.radius);
+    var targetData = targetButtons[Math.floor(Math.random()*targetButtons.length)];
+    var x = Math.floor(Math.random()*(gameWindow.clientWidth-targetData.sizePxl));
+    var y = Math.floor(Math.random()*(gameWindow.clientHeight-targetData.sizePxl));
+    target = new Target(x,y,targetData.sizePxl);
+    drawCircle(target,targetData.innerColour,targetData.outerColour,target.radius);
 } 
 function clearTarget()
 {
@@ -115,7 +124,7 @@ function clearTarget()
 }
 function showStartButton()
 {
-    drawCircle(centre,"#005500","#003300",15);
+    drawCircle(centre,startButtonData.innerColour,startButtonData.outerColour,startButtonData.sizePxl);
     target = new Target(centre.x,centre.y,15);
 }
 function update(deltaTime)
@@ -169,6 +178,8 @@ var gameWindow = document.getElementById("gameWindow");
 var ctx = gameWindow.getContext("2d");
 var data = new TimeData();
 var centre = new Vector2(gameWindow.clientWidth/2,gameWindow.clientHeight/2);
+var startButtonData = new ColourData("#005500","#003300",15);
+var targetButtons = [new ColourData("#c40000","#a30000",10),new ColourData("#cfc500","#afa600",30), new ColourData("#0033cc","#002aa9",30)];
 var hitTarget = false;
 var counting = false;
 var reacting = false;
