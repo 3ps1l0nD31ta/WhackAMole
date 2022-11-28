@@ -74,16 +74,66 @@ class TargetData
         this.sizePxl = sizePxl;
     }
 }
-class RespondingStage
+class WaitingStage
 {
+    constructor()
+    {
+        this.time = 0;
+    }
+    onTargetHit()
+    {
+        clearTarget();
+        transitionStage(new DrawingStage());
+    }
     update(delta)
     {
-        if(hitTarget)
-        {
-            console.log(delta);
-        }
+        this.time += delta;
     }
 }
+class DrawingStage
+{
+    constructor()
+    {
+        this.time = 0;
+    }
+    update(delta)
+    {
+        this.time += delta;
+        if(this.time > 2000)
+        {
+            showNewTarget();
+            transitionStage(new RespondingStage());
+        }
+    }
+    onTargetHit()
+    {
+    }
+}
+class RespondingStage
+{
+    constructor()
+    {
+        this.time = 0;
+    }
+    update(delta)
+    {
+        this.time += delta;
+    }
+
+    onTargetHit()
+    {
+        clearTarget();
+        showStartButton();
+        data.push(this.time);
+        transitionStage(new WaitingStage());
+    }
+}
+
+function transitionStage(nextStage)
+{
+    stage = nextStage;
+}
+
 function getMousePos(canvas, evt) {
   var rect = canvas.getBoundingClientRect();
   return new Vector2(evt.clientX - rect.left,evt.clientY - rect.top);
@@ -116,8 +166,8 @@ function onMouseDown(evt)
     var mousePos = getMousePos(gameWindow,evt);
     if(withinTarget(mousePos,target))
     {
+        stage.onTargetHit();
         console.log("hit button");
-        hitTarget = !hitTarget;
     }
 }
 function showNewTarget()
@@ -137,43 +187,11 @@ function showStartButton()
     drawCircle(centre,startButtonData.innerColour,startButtonData.outerColour,startButtonData.sizePxl);
     target = new Target(centre.x,centre.y,15);
 }
-function update(deltaTime)
-{
-    console.log(hitTarget);
-    stage.update(deltaTime);
-    if(hitTarget)
-    {
-        if(reacting)
-        {
-            clearTarget();
-            showStartButton();
-            counting = false;
-            hitTarget = false;
-            reacting = false;
-            data.push(count);
-            count = 0;
-        }else{
-            clearTarget();
-            counting = true;
-        }
-        if(count>2000)
-        {
-            hitTarget = false;
-            count = 0;
-            showNewTarget();
-            reacting = true;
-        }
-    }
-    if(counting)
-    {
-        count += deltaTime;
-    }
-}
 function loop(timestamp)
 {
     var deltaTime = timestamp - lastRender;
 
-    update(deltaTime);
+    stage.update(deltaTime);
 
     lastRender = timestamp;
     window.requestAnimationFrame(loop);
@@ -192,15 +210,11 @@ var data = new TimeData();
 var centre = new Vector2(gameWindow.clientWidth/2,gameWindow.clientHeight/2);
 var startButtonData = new TargetData("#005500","#003300",15);
 var targetButtons = [new TargetData("#c40000","#a30000",10),new TargetData("#cfc500","#afa600",30), new TargetData("#0033cc","#002aa9",30)];
-var hitTarget = false;
-var counting = false;
-var reacting = false;
 var targetSizes = [10,30,50];
 var lastRender = 0;
 var target;
-var count = 0;
 
-var stage = new RespondingStage();
+
+var stage = new WaitingStage();
 
 init();
-
