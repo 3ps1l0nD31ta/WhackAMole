@@ -24,7 +24,7 @@ class TimeData extends Array
     }
     outputToFile(){
         var element = document.createElement('a');
-        var outputString = "mean: " + this.getMean() + "\n";
+        var outputString = "mean: " + this.getMean() + ". Count: " + this.length + "\n";
         element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(outputString.concat(this.getString())));
         element.setAttribute('download', "WhackAMoleTimings.txt");
 
@@ -74,7 +74,7 @@ class TargetData
         this.sizePxl = sizePxl;
     }
 }
-class WaitingStage
+class WaitingSubStage
 {
     constructor()
     {
@@ -83,14 +83,14 @@ class WaitingStage
     onTargetHit()
     {
         clearTarget();
-        transitionStage(new DrawingStage());
+        stage.transitionSubStage(new DrawingSubStage());
     }
     update(delta)
     {
         this.time += delta;
     }
 }
-class DrawingStage
+class DrawingSubStage
 {
     constructor()
     {
@@ -102,14 +102,14 @@ class DrawingStage
         if(this.time > 2000)
         {
             showNewTarget();
-            transitionStage(new RespondingStage());
+            stage.transitionSubStage(new RespondingSubStage());
         }
     }
     onTargetHit()
     {
     }
 }
-class RespondingStage
+class RespondingSubStage
 {
     constructor()
     {
@@ -125,10 +125,54 @@ class RespondingStage
         clearTarget();
         showStartButton();
         data.push(this.time);
-        transitionStage(new WaitingStage());
+        stage.transitionSubStage(new WaitingSubStage());
     }
 }
-
+class PreGameStage
+{
+    constructor()
+    {
+        this.time = 0;
+    }
+    onTargetHit()
+    {
+        clearTarget();
+        transitionStage(new GameStage());
+    }
+    update(delta)
+    {
+        this.time += delta;
+    }
+}
+class GameStage
+{
+    constructor()
+    {
+        this.time = 0;
+        this.subStage = new DrawingSubStage();
+    }
+    update(delta)
+    {
+        this.subStage.update(delta);
+        this.time += delta;
+        if(this.time > 60000)
+        {
+            data.outputToFile();
+            data = new TimeData();
+            clearTarget();
+            showStartButton();
+            transitionStage(new PreGameStage());
+        }
+    }
+    onTargetHit()
+    {
+        this.subStage.onTargetHit();
+    }
+    transitionSubStage(nextSubStage)
+    {
+        this.subStage = nextSubStage;
+    }
+}
 function transitionStage(nextStage)
 {
     stage = nextStage;
@@ -209,12 +253,12 @@ var ctx = gameWindow.getContext("2d");
 var data = new TimeData();
 var centre = new Vector2(gameWindow.clientWidth/2,gameWindow.clientHeight/2);
 var startButtonData = new TargetData("#005500","#003300",15);
-var targetButtons = [new TargetData("#c40000","#a30000",10),new TargetData("#cfc500","#afa600",30), new TargetData("#0033cc","#002aa9",30)];
+var targetButtons = [new TargetData("#c40000","#a30000",10),new TargetData("#cfc500","#afa600",30), new TargetData("#0033cc","#002aa9",50)];
 var targetSizes = [10,30,50];
 var lastRender = 0;
 var target;
 
 
-var stage = new WaitingStage();
+var stage = new PreGameStage();
 
 init();
